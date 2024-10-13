@@ -1,7 +1,6 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import client from "@repo/database";
 
-const client = new PrismaClient();
 const app = express();
 app.use(express.json());
 
@@ -11,7 +10,7 @@ app.post("/hooks/catch/:userId/:flowId", async (req, res) => {
   const body = req.body;
 
   // storea new trigger in db
-  await client.$transaction(async (tx) => {
+  await client.$transaction(async (tx: any) => {
     const run = await tx.flowRun.create({
       data: {
         FlowId: flowId,
