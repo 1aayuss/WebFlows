@@ -12,3 +12,66 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String
+  password String
+  flow     Flow[]
+}
+
+model Flow {
+  id        String    @id @default(uuid())
+  triggerId String
+  userId    Int
+  trigger   Trigger?
+  actions   Action[]
+  flowRun   FlowRun[]
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Trigger {
+  id        String           @id @default(uuid())
+  FlowId    String           @unique
+  triggerId String
+  metadata  Json             @default("{}")
+  type      AvailableTrigger @relation(fields: [triggerId], references: [id])
+  flow      Flow             @relation(fields: [FlowId], references: [id])
+}
+
+model Action {
+  id           String          @id @default(uuid())
+  FlowId       String
+  flow         Flow            @relation(fields: [FlowId], references: [id])
+  actionId     String
+  type         AvailableAction @relation(fields: [actionId], references: [id])
+  metadata     Json            @default("{}")
+  sortingOrder Int             @default(0)
+}
+
+model AvailableAction {
+  id     String   @id @default(uuid())
+  name   String
+  Action Action[]
+}
+
+model AvailableTrigger {
+  id       String    @id @default(uuid())
+  name     String
+  triggers Trigger[]
+}
+
+model FlowRun {
+  id            String         @id @default(uuid())
+  FlowId        String
+  metadata      Json
+  flow          Flow           @relation(fields: [FlowId], references: [id])
+  FlowRunOutbox FlowRunOutbox?
+}
+
+model FlowRunOutbox {
+  id        String  @id @default(uuid())
+  FlowRunId String  @unique
+  FlowRun   FlowRun @relation(fields: [FlowRunId], references: [id])
+}
