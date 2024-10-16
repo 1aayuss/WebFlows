@@ -5,7 +5,7 @@
     "build": {
       "dependsOn": ["packages-database", "packages-types"],
       "inputs": ["apps/**"],
-      "outputs": ["apps/**/.next/**", "packages/**/dist/**"],
+      "outputs": ["apps/**/.next/**", "packages/**/dist/**", "apps/**/dist/**"],
       "cache": false
     },
     "lint": {
@@ -23,6 +23,13 @@
     },
     "dev": {
       "dependsOn": ["packages-database", "packages-types"],
+      "inputs": ["apps/**"],
+      "outputs": [],
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "dependsOn": ["build"],
       "inputs": ["apps/**"],
       "outputs": [],
       "cache": false,

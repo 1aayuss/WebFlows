@@ -3,12 +3,13 @@
 import { BACKEND_URL } from "../../../../config";
 import LandingNavbar from "@/components/LandingNavbar";
 import { FlowCell } from "@/components/FlowCell";
-import { LinkButton } from "@/components/LinkButton";
+// import { LinkButton } from "@/components/LinkButton";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/Input";
+import Image from "next/image";
 
 function useAvailableActionsAndTriggers() {
     const [availableActions, setAvailableActions] = useState([]);
@@ -28,7 +29,7 @@ function useAvailableActionsAndTriggers() {
     }
 }
 
-export default function () {
+export default function CreateFlow() {
     const router = useRouter();
     const { availableActions, availableTriggers } = useAvailableActionsAndTriggers();
     const [selectedTrigger, setSelectedTrigger] = useState<{
@@ -40,7 +41,7 @@ export default function () {
         index: number;
         availableActionId: string;
         availableActionName: string;
-        metadata: any;
+        metadata: object;
     }[]>([]);
     const [selectedModalIndex, setSelectedModalIndex] = useState<null | number>(null);
 
@@ -55,7 +56,7 @@ export default function () {
                 const response = await axios.post(`${BACKEND_URL}/api/v1/flow`, {
                     "availableTriggerId": selectedTrigger.id,
                     "triggerMetadata": {},
-                    "actions": selectedActions.map(a => ({
+                    "actions": selectedActions.map((a) => ({
                         availableActionId: a.availableActionId,
                         actionMetadata: a.metadata
                     }))
@@ -65,7 +66,8 @@ export default function () {
                     }
                 })
 
-                router.push("/dashboard");
+                if (response.status === 200) router.push("/dashboard");
+
 
             }}>Publish</PrimaryButton>
         </div>
@@ -76,7 +78,7 @@ export default function () {
                 }} name={selectedTrigger?.name ? selectedTrigger.name : "Trigger"} index={1} />
             </div>
             <div className="w-full pt-2 pb-2">
-                {selectedActions.map((action, index) => <div className="pt-2 flex justify-center"> <FlowCell onClick={() => {
+                {selectedActions.map((action) => <div key={action.index} className="pt-2 flex justify-center"> <FlowCell onClick={() => {
                     setSelectedModalIndex(action.index);
                 }} name={action.availableActionName ? action.availableActionName : "Action"} index={action.index} /> </div>)}
             </div>
@@ -95,7 +97,7 @@ export default function () {
                 </div>
             </div>
         </div>
-        {selectedModalIndex && <Modal availableItems={selectedModalIndex === 1 ? availableTriggers : availableActions} onSelect={(props: null | { name: string; id: string; metadata: any; }) => {
+        {selectedModalIndex && <Modal availableItems={selectedModalIndex === 1 ? availableTriggers : availableActions} onSelect={(props: null | { name: string; id: string; metadata: object; }) => {
             if (props === null) {
                 setSelectedModalIndex(null);
                 return;
@@ -107,7 +109,7 @@ export default function () {
                 })
             } else {
                 setSelectedActions(a => {
-                    let newActions = [...a];
+                    const newActions = [...a];
                     newActions[selectedModalIndex - 2] = {
                         index: selectedModalIndex,
                         availableActionId: props.id,
@@ -122,7 +124,7 @@ export default function () {
     </div>
 }
 
-function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (props: null | { name: string; id: string; metadata: any; }) => void, availableItems: { id: string, name: string, image: string; }[] }) {
+function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (props: null | { name: string; id: string; metadata: object; }) => void, availableItems: { id: string, name: string, image: string; }[] }) {
     const [step, setStep] = useState(0);
     const [selectedAction, setSelectedAction] = useState<{
         id: string;
@@ -162,7 +164,7 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
                     }} />}
 
                     {step === 0 && <div>{availableItems.map(({ id, name, image }) => {
-                        return <div onClick={() => {
+                        return <div key={id} onClick={() => {
                             if (isTrigger) {
                                 onSelect({
                                     id,
@@ -177,7 +179,7 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
                                 })
                             }
                         }} className="flex border p-4 cursor-pointer hover:bg-slate-100">
-                            <img src={image} width={30} className="rounded-full" /> <div className="flex flex-col justify-center"> {name} </div>
+                            <Image alt="icon" src={image} width={30} className="rounded-full" /> <div className="flex flex-col justify-center"> {name} </div>
                         </div>
                     })}</div>}
                 </div>
@@ -188,7 +190,7 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
 }
 
 function EmailSelector({ setMetadata }: {
-    setMetadata: (params: any) => void;
+    setMetadata: (params: object) => void;
 }) {
     const [email, setEmail] = useState("");
     const [body, setBody] = useState("");
@@ -208,7 +210,7 @@ function EmailSelector({ setMetadata }: {
 }
 
 function SolanaSelector({ setMetadata }: {
-    setMetadata: (params: any) => void;
+    setMetadata: (params: object) => void;
 }) {
     const [amount, setAmount] = useState("");
     const [address, setAddress] = useState("");
