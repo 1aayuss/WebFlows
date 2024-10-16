@@ -29,4 +29,6 @@ app.post("/hooks/catch/:userId/:flowId", async (req, res) => {
   });
 });
 
-app.listen(3002);
+app.listen(3002, () => {
+  console.log("Hooks Listening on port 3002");
+});

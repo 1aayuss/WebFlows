@@ -19,7 +19,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
       });
     }
 
-    const flowId = await client.$transaction(async (tx) => {
+    const flowId = await client.$transaction(async (tx: any) => {
       const flow = await client.flow.create({
         data: {
           userId: parseInt(id),

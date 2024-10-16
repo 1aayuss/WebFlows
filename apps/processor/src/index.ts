@@ -20,7 +20,7 @@ async function main() {
 
     producer.send({
       topic: TOPIC_NAME,
-      messages: pendingRows.map((row) => ({
+      messages: pendingRows.map((row: any) => ({
         value: row.FlowRunId,
       })),
     });
@@ -28,7 +28,7 @@ async function main() {
     await client.flowRunOutbox.deleteMany({
       where: {
         id: {
-          in: pendingRows.map((row) => row.id),
+          in: pendingRows.map((row: any) => row.id),
         },
       },
     });

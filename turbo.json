@@ -3,14 +3,28 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": ["packages-database", "packages-types"],
+      "inputs": ["apps/**"],
+      "outputs": ["apps/**/.next/**", "packages/**/dist/**"],
+      "cache": false
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "packages-database": {
+      "inputs": ["packages/database/index.ts"],
+      "outputs": ["packages/database/dist/"],
+      "cache": true
+    },
+    "packages-types": {
+      "inputs": ["packages/types/index.ts"],
+      "outputs": ["packages/types/dist/"],
+      "cache": true
+    },
     "dev": {
+      "dependsOn": ["packages-database", "packages-types"],
+      "inputs": ["apps/**"],
+      "outputs": [],
       "cache": false,
       "persistent": true
     }
