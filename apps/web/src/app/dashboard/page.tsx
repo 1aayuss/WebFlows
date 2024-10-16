@@ -1,3 +1,101 @@
-export default function Page() {
-    return <div>Dashboard</div>;
+"use client"
+import LandingNavbar from "@/components/LandingNavbar";
+import { DarkButton } from "@/components/DarkButton";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { BACKEND_URL, HOOKS_URL } from "../../../config";
+import { LinkButton } from "@/components/LinkButton";
+import { useRouter } from "next/navigation";
+
+interface Flow {
+    "id": string,
+    "triggerId": string,
+    "userId": number,
+    "actions": {
+        "id": string,
+        "flowId": string,
+        "actionId": string,
+        "sortingOrder": number,
+        "type": {
+            "id": string,
+            "name": string
+            "image": string
+        }
+    }[],
+    "trigger": {
+        "id": string,
+        "flowId": string,
+        "triggerId": string,
+        "type": {
+            "id": string,
+            "name": string,
+            "image": string
+        }
+    }
+}
+
+function useFlows() {
+    const [loading, setLoading] = useState(true);
+    const [flows, setFlows] = useState<Flow[]>([]);
+
+    useEffect(() => {
+        axios.get(`${BACKEND_URL}/api/v1/flow`, {
+            headers: {
+                "Authorization": localStorage.getItem("token")
+            }
+        })
+            .then(res => {
+                setFlows(res.data.flows);
+                setLoading(false)
+            })
+    }, []);
+
+    return {
+        loading, flows
+    }
+}
+
+export default function () {
+    const { loading, flows } = useFlows();
+    const router = useRouter();
+
+    return <div>
+        <LandingNavbar />
+        <div className="flex justify-center pt-8">
+            <div className="max-w-screen-lg	 w-full">
+                <div className="flex justify-between pr-8 ">
+                    <div className="text-2xl font-bold">
+                        My Flows
+                    </div>
+                    <DarkButton onClick={() => {
+                        router.push("/flow/create");
+                    }}>Create</DarkButton>
+                </div>
+            </div>
+        </div>
+        {loading ? "Loading..." : <div className="flex justify-center"> <FlowTable flows={flows} /> </div>}
+    </div>
+}
+
+function FlowTable({ flows }: { flows: Flow[] }) {
+    const router = useRouter();
+
+    return <div className="p-8 max-w-screen-lg w-full">
+        <div className="flex">
+            <div className="flex-1">Name</div>
+            <div className="flex-1">ID</div>
+            <div className="flex-1">Created at</div>
+            <div className="flex-1">Webhook URL</div>
+            <div className="flex-1">Go</div>
+        </div>
+        {flows.map(z => <div className="flex border-b border-t py-4">
+            <div className="flex-1 flex"><img src={z.trigger.type.image} className="w-[30px] h-[30px]" /> {z.actions.map(x => <img src={x.type.image} className="w-[30px] h-[30px]" />)}</div>
+            <div className="flex-1">{z.id}</div>
+            <div className="flex-1">Nov 13, 2023</div>
+            <div className="flex-1">{`${HOOKS_URL}/hooks/catch/1/${z.id}`}</div>
+            <div className="flex-1"><LinkButton onClick={() => {
+                router.push("/flow/" + z.id)
+            }}>Go</LinkButton></div>
+        </div>)}
+    </div>
 }

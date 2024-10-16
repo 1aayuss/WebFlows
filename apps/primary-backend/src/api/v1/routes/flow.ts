@@ -88,13 +88,6 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
       },
     });
 
-    if (!flows.length) {
-      res.status(404).json({
-        success: false,
-        message: "No flows found for this user.",
-      });
-    }
-
     res.status(200).json({
       success: true,
       flows: flows,

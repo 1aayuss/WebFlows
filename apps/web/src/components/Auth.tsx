@@ -22,7 +22,7 @@ export const Auth = ({ type }: { type: "signup" | "login" }) => {
     async function sendRequest() {
         try {
             const response = await axios.post(`${BACKEND_URL}/api/v1/auth/${type === "signup" ? "signup" : "signin"}`, postInputs);
-            const jwt = response.data.jwt;
+            const jwt = response.data.token;
             localStorage.setItem("token", jwt);
             router.push("/dashboard");
         } catch (e) {
