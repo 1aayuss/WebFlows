@@ -36,7 +36,7 @@ router.post("/signup", async (req: Request, res: Response) => {
   }
 
   try {
-    await client.user.create({
+    const newUser = await client.user.create({
       data: {
         email: parsedData.data!.username,
         // TODO: Don't store passwords in plaintext, hash it
@@ -45,11 +45,19 @@ router.post("/signup", async (req: Request, res: Response) => {
       },
     });
 
-    // await sendEmail();
+    // Generate a JWT token for the new user
+    const token = jwt.sign(
+      {
+        id: newUser.id,
+      },
+      JWT_PASSWORD
+    );
 
+    // Return the token along with the success message
     res.status(200).json({
       success: true,
       message: "New user created successfully",
+      token: token,
     });
   } catch (error) {
     console.log(error);
