@@ -12,6 +12,7 @@ export const SigninSchema = z.object({
 });
 
 export const flowCreateSchema = z.object({
+  flowName: z.string(),
   availableTriggerId: z.string(),
   triggerMetadata: z.any().optional(),
   actions: z.array(

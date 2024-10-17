@@ -45,15 +45,22 @@ export default function CreateFlow() {
     }[]>([]);
     const [selectedModalIndex, setSelectedModalIndex] = useState<null | number>(null);
 
+    const [flowName, setFlowName] = useState<string>("Untitled Flow");
+
     return <div>
         <LandingNavbar />
-        <div className="flex justify-end bg-slate-200 p-4">
+        <div className="flex justify-between bg-slate-200 p-4 border border-black">
+            <div></div>
+            <div>
+                <Input onChange={(e) => setFlowName(e.target.value)} label={""} placeholder={""} type={"text"} defaultValue={"Untitled flow"} required={false}></Input>
+            </div>
             <PrimaryButton onClick={async () => {
                 if (!selectedTrigger?.id) {
                     return;
                 }
 
                 const response = await axios.post(`${BACKEND_URL}/api/v1/flow`, {
+                    "flowName": flowName,
                     "availableTriggerId": selectedTrigger.id,
                     "triggerMetadata": {},
                     "actions": selectedActions.map((a) => ({
@@ -124,7 +131,7 @@ export default function CreateFlow() {
     </div>
 }
 
-function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (props: null | { name: string; id: string; metadata: object; }) => void, availableItems: { id: string, name: string, image: string; }[] }) {
+function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (props: null | { name: string; id: string; metadata: object; }) => void, availableItems: { id: string, name: string, icon: string; }[] }) {
     const [step, setStep] = useState(0);
     const [selectedAction, setSelectedAction] = useState<{
         id: string;
@@ -149,21 +156,21 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
                     </button>
                 </div>
                 <div className="p-4 md:p-5 space-y-4">
-                    {step === 1 && selectedAction?.name === "Mail" && <EmailSelector setMetadata={(metadata) => {
+                    {step === 1 && selectedAction?.name === "Email" && <EmailSelector setMetadata={(metadata) => {
                         onSelect({
                             ...selectedAction,
                             metadata
                         })
                     }} />}
 
-                    {(step === 1 && selectedAction?.name === "Send Money") && <SolanaSelector setMetadata={(metadata) => {
+                    {(step === 1 && selectedAction?.name === "Solana") && <SolanaSelector setMetadata={(metadata) => {
                         onSelect({
                             ...selectedAction,
                             metadata
                         })
                     }} />}
 
-                    {step === 0 && <div>{availableItems.map(({ id, name, image }) => {
+                    {step === 0 && <div>{availableItems.map(({ id, name, icon }) => {
                         return <div key={id} onClick={() => {
                             if (isTrigger) {
                                 onSelect({
@@ -178,8 +185,8 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
                                     name
                                 })
                             }
-                        }} className="flex border p-4 cursor-pointer hover:bg-slate-100">
-                            <Image alt="icon" src={image} width={30} className="rounded-full" /> <div className="flex flex-col justify-center"> {name} </div>
+                        }} className="flex border p-4 cursor-pointer hover:bg-slate-100 gap-x-2">
+                            <Image alt="icon" src={icon + ".svg"} height={30} width={30} className="h-6 w-6" /> <div className="flex flex-col justify-center"> {name} </div>
                         </div>
                     })}</div>}
                 </div>
@@ -196,8 +203,8 @@ function EmailSelector({ setMetadata }: {
     const [body, setBody] = useState("");
 
     return <div>
-        <Input label={"To"} type={"text"} placeholder="To" onChange={(e) => setEmail(e.target.value)}></Input>
-        <Input label={"Body"} type={"text"} placeholder="Body" onChange={(e) => setBody(e.target.value)}></Input>
+        <Input label={"To"} type={"text"} placeholder="To" onChange={(e) => setEmail(e.target.value)} required={true} defaultValue={""}></Input>
+        <Input label={"Body"} type={"text"} placeholder="Body" onChange={(e) => setBody(e.target.value)} required={true} defaultValue={""}></Input>
         <div className="pt-2">
             <PrimaryButton onClick={() => {
                 setMetadata({
@@ -216,8 +223,8 @@ function SolanaSelector({ setMetadata }: {
     const [address, setAddress] = useState("");
 
     return <div>
-        <Input label={"To"} type={"text"} placeholder="To" onChange={(e) => setAddress(e.target.value)}></Input>
-        <Input label={"Amount"} type={"text"} placeholder="To" onChange={(e) => setAmount(e.target.value)}></Input>
+        <Input label={"To"} type={"text"} placeholder="To" onChange={(e) => setAddress(e.target.value)} required={true} defaultValue={""}></Input>
+        <Input label={"Amount"} type={"text"} placeholder="To" onChange={(e) => setAmount(e.target.value)} required={true} defaultValue={""}></Input>
         <div className="pt-4">
             <PrimaryButton onClick={() => {
                 setMetadata({

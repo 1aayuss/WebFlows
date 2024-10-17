@@ -22,6 +22,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
     const flowId = await client.$transaction(async (tx: any) => {
       const flow = await client.flow.create({
         data: {
+          flowName: parsedData.data!.flowName || "Untitled Flow",
           userId: parseInt(id),
           triggerId: "",
           actions: {
@@ -50,12 +51,12 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
         },
       });
 
-      return flow.id;
+      return flow;
     });
 
     res.status(200).json({
       success: true,
-      flowId: flowId,
+      flow: flowId,
     });
   } catch (error) {
     console.log(error);
@@ -131,12 +132,12 @@ router.get("/:flowId", authMiddleware, async (req, res) => {
         success: false,
         message: `Flow with ID ${flowId} not found.`,
       });
+    } else {
+      res.status(200).json({
+        success: true,
+        flow: flow,
+      });
     }
-
-    res.status(200).json({
-      success: true,
-      flow: flow,
-    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
