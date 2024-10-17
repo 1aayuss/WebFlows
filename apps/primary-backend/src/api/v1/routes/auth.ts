@@ -4,6 +4,7 @@ import { SigninSchema, SignupSchema } from "@repo/types";
 import client from "@repo/database";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { hashpass, comparepass } from "./../../../passwordHashing.js";
 dotenv.config();
 
 const router: Router = express.Router();
@@ -36,11 +37,11 @@ router.post("/signup", async (req: Request, res: Response) => {
   }
 
   try {
+    const hashedPassword = await hashpass(parsedData.data!.password);
     const newUser = await client.user.create({
       data: {
         email: parsedData.data!.username,
-        // TODO: Don't store passwords in plaintext, hash it
-        password: parsedData.data!.password,
+        password: hashedPassword,
         name: parsedData.data!.name,
       },
     });
@@ -83,30 +84,36 @@ router.post("/signin", async (req: Request, res: Response) => {
   const user = await client.user.findFirst({
     where: {
       email: parsedData.data!.username,
-      password: parsedData.data!.password, // TODO: Validate password with hashing
     },
   });
 
   if (!user) {
     res.status(401).json({
       success: false,
-      message: "Unauthorized, credentials are incorrect",
+      message: "No user found",
     });
   }
 
-  // sign the JWT
-  const token = jwt.sign(
-    {
-      id: user!.id,
-    },
-    JWT_PASSWORD
-  );
-
-  res.status(200).json({
-    success: true,
-    message: "User signed in successfully",
-    token: token,
-  });
+  const pass = await comparepass(parsedData.data!.password, user!.password);
+  if (pass) {
+    // sign the JWT
+    const token = jwt.sign(
+      {
+        id: user!.id,
+      },
+      JWT_PASSWORD
+    );
+    res.status(200).json({
+      success: true,
+      message: "User signed in successfully",
+      token: token,
+    });
+  } else {
+    res.status(401).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
 });
 
 export const authRouter = router;
