@@ -6,6 +6,7 @@ import { FlowCell } from "@/components/FlowCell";
 // import { LinkButton } from "@/components/LinkButton";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import axios from "axios";
+import { JsonObject } from "@prisma/client/runtime/library";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/Input";
@@ -41,7 +42,7 @@ export default function CreateFlow() {
         index: number;
         availableActionId: string;
         availableActionName: string;
-        metadata: object;
+        metadata: JsonObject;
     }[]>([]);
     const [selectedModalIndex, setSelectedModalIndex] = useState<null | number>(null);
 
@@ -104,7 +105,7 @@ export default function CreateFlow() {
                 </div>
             </div>
         </div>
-        {selectedModalIndex && <Modal availableItems={selectedModalIndex === 1 ? availableTriggers : availableActions} onSelect={(props: null | { name: string; id: string; metadata: object; }) => {
+        {selectedModalIndex && <Modal availableItems={selectedModalIndex === 1 ? availableTriggers : availableActions} onSelect={(props: null | { name: string; id: string; metadata: JsonObject; }) => {
             if (props === null) {
                 setSelectedModalIndex(null);
                 return;
@@ -131,7 +132,7 @@ export default function CreateFlow() {
     </div>
 }
 
-function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (props: null | { name: string; id: string; metadata: object; }) => void, availableItems: { id: string, name: string, icon: string; }[] }) {
+function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (props: null | { name: string; id: string; metadata: JsonObject; }) => void, availableItems: { id: string, name: string, icon: string; }[] }) {
     const [step, setStep] = useState(0);
     const [selectedAction, setSelectedAction] = useState<{
         id: string;
@@ -197,7 +198,7 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
 }
 
 function EmailSelector({ setMetadata }: {
-    setMetadata: (params: object) => void;
+    setMetadata: (params: JsonObject) => void;
 }) {
     const [email, setEmail] = useState("");
     const [body, setBody] = useState("");
@@ -217,7 +218,7 @@ function EmailSelector({ setMetadata }: {
 }
 
 function SolanaSelector({ setMetadata }: {
-    setMetadata: (params: object) => void;
+    setMetadata: (params: JsonObject) => void;
 }) {
     const [amount, setAmount] = useState("");
     const [address, setAddress] = useState("");

@@ -13,6 +13,8 @@ import { formatDistanceToNow } from 'date-fns';
 
 interface Flow {
     "id": string,
+    "icon": string,
+    "createdAt": string,
     "flowName": string,
     "updatedAt": string,
     "triggerId": string,
@@ -25,7 +27,7 @@ interface Flow {
         "type": {
             "id": string,
             "name": string
-            "image": string
+            "icon": string
         }
     }[],
     "trigger": {
@@ -35,7 +37,7 @@ interface Flow {
         "type": {
             "id": string,
             "name": string,
-            "image": string
+            "icon": string
         }
     }
 }
@@ -94,7 +96,7 @@ export default function Dashboard() {
     </div>
 }
 
-function FlowTable({ flows }: any) {
+function FlowTable({ flows }: { flows: Flow[] }) {
     return (
         <div className="p-8 max-w-screen-lg w-full">
             {/* Table header */}
@@ -107,7 +109,7 @@ function FlowTable({ flows }: any) {
             </div>
 
             {/* Table rows */}
-            {flows.map((flow: any) => {
+            {flows.map((flow: Flow) => {
                 const fullUrl = `${HOOKS_URL}/hooks/catch/${flow.userId}/${flow.id}`;
                 return (
                     <div key={flow.id} className="flex border-b py-4 items-center">
@@ -122,7 +124,7 @@ function FlowTable({ flows }: any) {
                                 className="w-5 h-5 object-cover"
                             />
                             {/* Actions Icons */}
-                            {flow.actions.map((action: any) => (
+                            {flow.actions.map((action: { id: string; flowId: string; actionId: string; sortingOrder: number; type: { id: string; name: string; icon: string } } ) => (
                                 <Image
                                     key={action.id}
                                     alt="action-icon"

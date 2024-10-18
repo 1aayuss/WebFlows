@@ -18,10 +18,12 @@ async function main() {
       take: 10,
     });
 
+    console.log(pendingRows);
+
     producer.send({
       topic: TOPIC_NAME,
       messages: pendingRows.map((row: any) => ({
-        value: row.FlowRunId,
+        value: JSON.stringify({ flowRunId: row.FlowRunId, stage: 0 }),
       })),
     });
 
@@ -32,6 +34,8 @@ async function main() {
         },
       },
     });
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 }
 
