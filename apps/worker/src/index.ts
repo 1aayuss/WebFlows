@@ -90,8 +90,13 @@ async function main() {
           flowRunMetadata
         );
         console.log("to:" + to);
+        const subject = parse(
+          (currentAction.metadata as JsonObject)?.subject as string,
+          flowRunMetadata
+        );
+        console.log("subject:" + subject);
         console.log("Sending email...");
-        await sendEmail(to, body);
+        await sendEmail(to, subject, body);
       }
 
       // Handle SOL sending action

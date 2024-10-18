@@ -10,12 +10,12 @@ const transport = nodemailer.createTransport({
   },
 });
 
-export async function sendEmail(to: string, body: string) {
+export async function sendEmail(to: string, subject: string, body: string) {
   await transport.sendMail({
     from: "email.service.webflows@gmail.com",
     sender: "email.service.webflows@gmail.com",
     to,
-    subject: "Hello from webflows",
+    subject: subject,
     text: body,
   });
   console.log("email sent");

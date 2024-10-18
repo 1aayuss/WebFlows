@@ -202,14 +202,17 @@ function EmailSelector({ setMetadata }: {
 }) {
     const [email, setEmail] = useState("");
     const [body, setBody] = useState("");
+    const [subject, setSubject] = useState("");
 
     return <div>
         <Input label={"To"} type={"text"} placeholder="To" onChange={(e) => setEmail(e.target.value)} required={true} defaultValue={""}></Input>
+        <Input label={"Subject"} type={"text"} placeholder="Subject" onChange={(e) => setSubject(e.target.value)} required={true} defaultValue={""}></Input>
         <Input label={"Body"} type={"text"} placeholder="Body" onChange={(e) => setBody(e.target.value)} required={true} defaultValue={""}></Input>
         <div className="pt-2">
             <PrimaryButton onClick={() => {
                 setMetadata({
                     email,
+                    subject,
                     body
                 })
             }}>Submit</PrimaryButton>
